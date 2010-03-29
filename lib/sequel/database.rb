@@ -854,10 +854,14 @@ module Sequel
     # and traceback.
     def raise_error(exception, opts={})
       if !opts[:classes] || Array(opts[:classes]).any?{|c| exception.is_a?(c)}
-        raise Sequel.convert_exception_class(exception, opts[:disconnect] ? DatabaseDisconnectError : DatabaseError)
-      else
-        raise exception
+        exception = Sequel.convert_exception_class(exception, opts[:disconnect] ? DatabaseDisconnectError : DatabaseError)
       end
+      if opts[:query]
+        e = exception.class.new(exception.message + "(#{opts[:query]})") 
+        e.set_backtrace(exception.backtrace)
+        exception = e
+      end
+      raise exception
     end
     
     # Remove the cached schema for the given schema name

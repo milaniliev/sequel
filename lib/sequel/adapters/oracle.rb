@@ -67,7 +67,7 @@ module Sequel
             yield(r) if block_given?
             r
           rescue OCIException => e
-            raise_error(e, :disconnect=>CONNECTION_ERROR_CODES.include?(e.code))
+            raise_error(e, :disconnect=>CONNECTION_ERROR_CODES.include?(e.code), :query => sql)
           end
         end
       end
